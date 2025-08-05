@@ -1,22 +1,67 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:mini_social_media/components/my_button.dart';
 import 'package:mini_social_media/components/my_textfield.dart';
+import 'package:mini_social_media/helper/helper_function.dart';
 
-class RegisterPage extends StatelessWidget {
+class RegisterPage extends StatefulWidget {
   final void Function()? onTap;
-  RegisterPage({
+  const RegisterPage({
     super.key,
     required this.onTap,
   });
 
+  @override
+  State<RegisterPage> createState() => _RegisterPageState();
+}
+
+class _RegisterPageState extends State<RegisterPage> {
   //text controllers
   final TextEditingController usernameController = TextEditingController();
+
   final TextEditingController emailController = TextEditingController();
+
   final TextEditingController passwordController = TextEditingController();
+
   final TextEditingController confirmPWController = TextEditingController();
 
-  //login methods
-  void register() {}
+  //register methods
+  void register() async {
+    // show loading circle
+    showDialog(
+      context: context,
+      builder: (context) => const Center(
+        child: CircularProgressIndicator(),
+      ),
+    );
+
+    // make sure password match
+    if (passwordController.text != confirmPWController.text) {
+      // pop loading circle
+      Navigator.pop(context);
+
+      // show error message to user
+      displayMessageToUser("Password don't match!", context);
+      return;
+    }
+    // if password match
+    else {
+      try {
+        // create the user
+        UserCredential? userCredential = await FirebaseAuth.instance
+            .createUserWithEmailAndPassword(
+                email: emailController.text, password: passwordController.text);
+        // pop up loading circle
+        Navigator.pop(context);
+      } on FirebaseAuthException catch (e) {
+        // pop loading circle
+        Navigator.pop(context);
+        // display error
+        displayMessageToUser(e.code, context);
+      }
+    }
+    // try creating user
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -129,7 +174,7 @@ class RegisterPage extends StatelessWidget {
                     ),
                   ),
                   GestureDetector(
-                    onTap: onTap,
+                    onTap: widget.onTap,
                     child: Text(
                       "Login Here!!",
                       style: TextStyle(
