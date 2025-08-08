@@ -1,36 +1,48 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:mini_social_media/pages/comments_page.dart';
 
 class MyPost extends StatelessWidget {
   final String message;
   final String userEmail;
   final Timestamp time;
+  final List likes;
+  final String postId;
+  final VoidCallback onLikePressed;
 
-  const MyPost(
-      {super.key,
-      required this.message,
-      required this.userEmail,
-      required this.time});
+  const MyPost({
+    super.key,
+    required this.message,
+    required this.userEmail,
+    required this.time,
+    required this.likes,
+    required this.postId,
+    required this.onLikePressed,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final currentUserEmail = FirebaseAuth.instance.currentUser!.email!;
+    final bool isLiked = likes.contains(currentUserEmail);
+
     return Padding(
       padding: const EdgeInsets.all(20),
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white, // 💡 Màu nền post
+          color: Colors.white,
           borderRadius: BorderRadius.circular(25),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header with avatar + email
+            // Header
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              padding: const EdgeInsets.only(
+                  top: 15, bottom: 15, left: 15, right: 15),
               child: Row(
                 children: [
-                  // Avatar
                   Container(
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
@@ -44,7 +56,6 @@ class MyPost extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 15),
-                  // User email
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -57,8 +68,7 @@ class MyPost extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        DateFormat('dd-MM-yyyy HH:mm')
-                            .format((time as Timestamp).toDate()),
+                        DateFormat('dd-MM-yyyy HH:mm').format((time).toDate()),
                         style: const TextStyle(
                           color: Colors.black87,
                           fontWeight: FontWeight.w400,
@@ -68,11 +78,7 @@ class MyPost extends StatelessWidget {
                     ],
                   ),
                   const Spacer(),
-                  const Icon(
-                    Icons.more_vert,
-                    color: Colors.grey,
-                    size: 30,
-                  ),
+                  const Icon(Icons.more_vert, color: Colors.grey, size: 30),
                 ],
               ),
             ),
@@ -93,30 +99,42 @@ class MyPost extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               child: Row(
-                children: const [
-                  Icon(
-                    Icons.favorite_border,
-                    color: Colors.grey,
-                    size: 30,
+                children: [
+                  GestureDetector(
+                    onTap: onLikePressed,
+                    child: Icon(
+                      isLiked ? Icons.favorite : Icons.favorite_border,
+                      color: isLiked ? Colors.red : Colors.grey,
+                      size: 30,
+                    ),
                   ),
-                  SizedBox(width: 16),
-                  Icon(
-                    Icons.comment_outlined,
-                    color: Colors.grey,
-                    size: 30,
+                  const SizedBox(width: 8),
+                  Text(
+                    '${likes.length}',
+                    style: const TextStyle(
+                      color: Colors.black87,
+                      fontWeight: FontWeight.w400,
+                      fontSize: 18,
+                    ),
                   ),
-                  SizedBox(width: 16),
-                  Icon(
-                    Icons.send_outlined,
-                    color: Colors.grey,
-                    size: 30,
+                  const SizedBox(width: 16),
+                  IconButton(
+                    icon: const Icon(Icons.comment_outlined,
+                        color: Colors.grey, size: 30),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => CommentPage(postId: postId),
+                        ),
+                      );
+                    },
                   ),
-                  Spacer(),
-                  Icon(
-                    Icons.bookmark_border,
-                    color: Colors.grey,
-                    size: 30,
-                  ),
+                  const SizedBox(width: 16),
+                  const Icon(Icons.send_outlined, color: Colors.grey, size: 30),
+                  const Spacer(),
+                  const Icon(Icons.bookmark_border,
+                      color: Colors.grey, size: 30),
                 ],
               ),
             ),

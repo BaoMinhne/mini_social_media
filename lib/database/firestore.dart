@@ -40,4 +40,30 @@ class FirestoreDatabase {
 
     return postsStream;
   }
+
+  Future<void> toggleLike(String postId) async {
+    final postRef = posts.doc(postId);
+    final snapshot = await postRef.get();
+
+    List likes = List.from(snapshot['Likes'] ?? []);
+    final currentUserEmail = user!.email;
+
+    if (likes.contains(currentUserEmail)) {
+      likes.remove(currentUserEmail);
+    } else {
+      likes.add(currentUserEmail);
+    }
+
+    await postRef.update({'Likes': likes});
+  }
+
+  Future<void> addComment(String postId, String commentText) async {
+    final comment = {
+      'CommentText': commentText,
+      'CommenterEmail': user!.email,
+      'TimeStamp': Timestamp.now(),
+    };
+
+    await posts.doc(postId).collection('Comments').add(comment);
+  }
 }

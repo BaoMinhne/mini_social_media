@@ -91,21 +91,26 @@ class HomePage extends StatelessWidget {
                 child: ListView.builder(
                   itemCount: posts.length,
                   itemBuilder: (context, index) {
-                    // get the individual post
                     final post = posts[index];
+                    final data = post.data() as Map<String, dynamic>;
 
-                    // get data from each post
-                    String message = post['PostMessage'];
-                    Timestamp timestamp = post['TimeStamp'];
-                    String userEmail = post['UserEmail'];
-                    userEmail =
-                        currentUser!.email == userEmail ? "You" : userEmail;
+                    String message = data['PostMessage'];
+                    Timestamp timestamp = data['TimeStamp'];
+                    String email = data['UserEmail'];
+                    List likes = data['Likes'] ?? [];
 
-                    // return as a list tile
+                    String displayEmail =
+                        currentUser!.email == email ? "You" : email;
+
                     return MyPost(
                       message: message,
-                      userEmail: userEmail,
+                      userEmail: displayEmail,
                       time: timestamp,
+                      likes: likes,
+                      postId: post.id,
+                      onLikePressed: () {
+                        FirestoreDatabase().toggleLike(post.id);
+                      },
                     );
                   },
                 ),
