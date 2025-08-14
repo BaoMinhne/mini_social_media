@@ -41,6 +41,19 @@ class FirestoreDatabase {
     return postsStream;
   }
 
+  // get comments for a specific post
+  Stream<QuerySnapshot> getCommentStream(String postId) {
+    final comments = FirebaseFirestore.instance
+        .collection("Posts")
+        .doc(postId)
+        .collection("Comments")
+        .orderBy("TimeStamp", descending: false)
+        .snapshots();
+
+    return comments;
+  }
+
+// toggle like for a post
   Future<void> toggleLike(String postId) async {
     final postRef = posts.doc(postId);
     final snapshot = await postRef.get();
@@ -57,6 +70,7 @@ class FirestoreDatabase {
     await postRef.update({'Likes': likes});
   }
 
+  // add a comment to a post
   Future<void> addComment(String postId, String commentText) async {
     final comment = {
       'CommentText': commentText,

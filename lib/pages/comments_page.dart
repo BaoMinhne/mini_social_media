@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:mini_social_media/components/my_comment_field.dart';
+import 'package:mini_social_media/components/my_textfield.dart';
 import '../database/firestore.dart';
 
 class CommentPage extends StatefulWidget {
@@ -14,7 +16,11 @@ class CommentPage extends StatefulWidget {
 
 class _CommentPageState extends State<CommentPage> {
   final TextEditingController commentController = TextEditingController();
+  // firestore access
   final FirestoreDatabase database = FirestoreDatabase();
+
+  // get current user
+  final User? currentUser = FirebaseAuth.instance.currentUser;
 
   void postComment() {
     if (commentController.text.trim().isNotEmpty) {
@@ -32,12 +38,7 @@ class _CommentPageState extends State<CommentPage> {
           // Danh sách comment
           Expanded(
             child: StreamBuilder(
-              stream: FirebaseFirestore.instance
-                  .collection("Posts")
-                  .doc(widget.postId)
-                  .collection("Comments")
-                  .orderBy("TimeStamp", descending: true)
-                  .snapshots(),
+              stream: database.getCommentStream(widget.postId),
               builder: (context, snapshot) {
                 if (!snapshot.hasData) {
                   return const Center(child: CircularProgressIndicator());
@@ -46,37 +47,27 @@ class _CommentPageState extends State<CommentPage> {
                 final comments = snapshot.data!.docs;
 
                 if (comments.isEmpty) {
-                  return const Center(child: Text("No comments yet..."));
+                  return const Center(
+                      child: Text(
+                    "No comments yet...",
+                    style: TextStyle(
+                      fontSize: 18,
+                    ),
+                  ));
                 }
 
                 return ListView.builder(
                   itemCount: comments.length,
                   itemBuilder: (context, index) {
                     final data = comments[index].data() as Map<String, dynamic>;
-                    return ListTile(
-                      title: Text(
-                        data['CommenterEmail'] ?? '',
-                        style: const TextStyle(
-                          color: Colors.black87,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18,
-                        ),
-                      ),
-                      subtitle: Text(
-                        data['CommentText'] ?? '',
-                        style: const TextStyle(
-                          color: Colors.black87,
-                          fontWeight: FontWeight.w400,
-                          fontSize: 16,
-                        ),
-                      ),
-                      trailing: Text(
-                        (data['TimeStamp'] as Timestamp)
-                            .toDate()
-                            .toString()
-                            .substring(0, 16),
-                        style: const TextStyle(fontSize: 12),
-                      ),
+                    String email = data['CommenterEmail'] ?? 'Unknown';
+                    // Hiển thị "You" nếu email của người bình luận là email của người dùng hiện tại
+                    String displayEmail =
+                        currentUser!.email == email ? "You" : email;
+                    return MyCommentField(
+                      userEmail: displayEmail,
+                      commentText: data['CommentText'] ?? '',
+                      time: data['TimeStamp'] as Timestamp,
                     );
                   },
                 );
@@ -90,16 +81,16 @@ class _CommentPageState extends State<CommentPage> {
             child: Row(
               children: [
                 Expanded(
-                  child: TextField(
-                    controller: commentController,
-                    decoration: const InputDecoration(
-                      hintText: "Add a comment...",
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
+                  child: MyTextfield(
+                      hintText: "Add Your Comment...",
+                      obscureText: false,
+                      controller: commentController),
                 ),
                 IconButton(
-                  icon: const Icon(Icons.send),
+                  icon: const Icon(
+                    Icons.send,
+                    size: 35,
+                  ),
                   onPressed: postComment,
                 ),
               ],
