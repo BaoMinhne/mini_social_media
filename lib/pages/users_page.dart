@@ -1,10 +1,16 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:mini_social_media/components/my_user_field.dart';
 import 'package:mini_social_media/helper/helper_function.dart';
+import 'package:mini_social_media/pages/chat_page.dart';
+import 'package:mini_social_media/services/chat/chat_service.dart';
 
 class UsersPage extends StatelessWidget {
-  const UsersPage({super.key});
+  UsersPage({super.key});
+
+  final ChatService _chatService = ChatService();
+  // get current user
+  final User? currentUser = FirebaseAuth.instance.currentUser;
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +25,7 @@ class UsersPage extends StatelessWidget {
       ),
       backgroundColor: Theme.of(context).colorScheme.background,
       body: StreamBuilder(
-        stream: FirebaseFirestore.instance.collection("Users").snapshots(),
+        stream: _chatService.getUserStream(),
         builder: (context, snapshot) {
           // any errors
           if (snapshot.hasError) {
@@ -37,20 +43,37 @@ class UsersPage extends StatelessWidget {
             return Text('No Data Found');
           }
 
-          // get all users
-          final users = snapshot.data!.docs;
-
-          return ListView.builder(
-            itemCount: users.length,
-            itemBuilder: (context, index) {
-              // get individual user
-              final user = users[index];
-              return MyUserField(
-                  userMail: user['email'], userName: user['username']);
-            },
+          return ListView(
+            children: snapshot.data!
+                .map<Widget>(
+                  (userData) => _buildUserListItem(userData, context),
+                )
+                .toList(),
           );
         },
       ),
     );
+  }
+
+  Widget _buildUserListItem(
+      Map<String, dynamic> userData, BuildContext context) {
+    // display all users except the current user
+    if (userData["email"] != currentUser!.email) {
+      return MyUserField(
+          userMail: userData["email"],
+          userName: userData["username"],
+          onTap: () {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ChatPage(
+                      reciverEmail: userData["email"],
+                      reciverName: userData["username"]),
+                ));
+          });
+    } else {
+      return const SizedBox
+          .shrink(); // Return an empty widget for the current user
+    }
   }
 }

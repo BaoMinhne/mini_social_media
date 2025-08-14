@@ -1,6 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:mini_social_media/auth/login_or_register.dart';
+import 'package:mini_social_media/services/auth/login_or_register.dart';
 import 'package:mini_social_media/pages/home_page.dart';
 
 class AuthPage extends StatelessWidget {

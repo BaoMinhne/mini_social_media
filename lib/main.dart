@@ -1,8 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:mini_social_media/auth/auth.dart';
-import 'package:mini_social_media/auth/login_or_register.dart';
+import 'package:mini_social_media/services/auth/auth.dart';
+import 'package:mini_social_media/services/auth/login_or_register.dart';
 import 'package:mini_social_media/firebase_options.dart';
 import 'package:mini_social_media/pages/home_page.dart';
 import 'package:mini_social_media/pages/profile_page.dart';
@@ -30,7 +30,7 @@ class MyApp extends StatelessWidget {
         '/login_register_page': (context) => const LoginOrRegister(),
         '/home_page': (context) => HomePage(),
         '/profile_page': (context) => ProfilePage(),
-        '/users_page': (context) => const UsersPage(),
+        '/users_page': (context) => UsersPage(),
       },
     );
   }
