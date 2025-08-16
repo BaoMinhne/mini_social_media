@@ -117,7 +117,7 @@ class MyPost extends StatelessWidget {
                       fontSize: 18,
                     ),
                   ),
-                  const SizedBox(width: 16),
+                  const SizedBox(width: 10),
                   IconButton(
                     icon: const Icon(Icons.comment_outlined,
                         color: Colors.grey, size: 30),
@@ -130,7 +130,7 @@ class MyPost extends StatelessWidget {
                       );
                     },
                   ),
-                  const SizedBox(width: 16),
+                  const SizedBox(width: 10),
                   const Icon(Icons.send_outlined, color: Colors.grey, size: 30),
                   const Spacer(),
                   const Icon(Icons.bookmark_border,

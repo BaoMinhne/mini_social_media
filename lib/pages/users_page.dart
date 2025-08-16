@@ -17,11 +17,13 @@ class UsersPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          "Users",
+          "U S E R S",
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        backgroundColor: Colors.transparent,
+        foregroundColor: Theme.of(context).colorScheme.inversePrimary,
+        elevation: 0,
       ),
       backgroundColor: Theme.of(context).colorScheme.background,
       body: StreamBuilder(
