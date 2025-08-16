@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:mini_social_media/components/chat_bubble.dart';
 import 'package:mini_social_media/components/my_user_input.dart';
 import 'package:mini_social_media/services/chat/chat_service.dart';
+import 'package:mini_social_media/services/img/image_service.dart';
 
-class ChatPage extends StatelessWidget {
+class ChatPage extends StatefulWidget {
   final String reciverEmail;
   final String reciverName;
   ChatPage({
@@ -12,8 +13,13 @@ class ChatPage extends StatelessWidget {
     required this.reciverName,
   });
 
+  @override
+  State<ChatPage> createState() => _ChatPageState();
+}
+
+class _ChatPageState extends State<ChatPage> {
   // têxt controller for message input
-  TextEditingController _messageController = TextEditingController();
+  final TextEditingController _messageController = TextEditingController();
 
   // chat service
   final ChatService chatService = ChatService();
@@ -23,9 +29,16 @@ class ChatPage extends StatelessWidget {
     // check there is something in the textfield
     if (_messageController.text.isNotEmpty) {
       String message = _messageController.text;
-      await chatService.sendMessage(reciverEmail, message);
+      await chatService.sendMessage(widget.reciverEmail, message);
       // clear the text field after sending
       _messageController.clear();
+    }
+  }
+
+  void pickAndSendImage() async {
+    final imageUrl = await ImageService.pickAndUploadImage();
+    if (imageUrl != null) {
+      await chatService.sendMessage(widget.reciverEmail, imageUrl);
     }
   }
 
@@ -34,7 +47,7 @@ class ChatPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          reciverName,
+          widget.reciverName,
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
@@ -58,7 +71,7 @@ class ChatPage extends StatelessWidget {
   Widget _buildMessagesList() {
     return StreamBuilder(
       stream: chatService.getMessages(
-          chatService.currentUser!.email!, reciverEmail),
+          chatService.currentUser!.email!, widget.reciverEmail),
       builder: (context, snapshot) {
         // check for errors
         if (snapshot.hasError) {
@@ -89,6 +102,7 @@ class ChatPage extends StatelessWidget {
     // align the message based on the sender
     Alignment alignment =
         isCurrentUser ? Alignment.centerRight : Alignment.centerLeft;
+
     return Container(
       alignment: alignment,
       child: ChatBubble(
@@ -106,9 +120,11 @@ class ChatPage extends StatelessWidget {
           // text field for user to type message
           Expanded(
               child: MyUserInput(
-                  hintText: "Aa...",
-                  obscureText: false,
-                  controller: _messageController)),
+            hintText: "Aa...",
+            obscureText: false,
+            controller: _messageController,
+            onAttachPressed: pickAndSendImage,
+          )),
 
           SizedBox(
             width: 10,

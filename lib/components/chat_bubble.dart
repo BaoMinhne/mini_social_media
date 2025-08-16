@@ -12,6 +12,10 @@ class ChatBubble extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isImage = message.startsWith('http') &&
+        (message.contains('.jpg') ||
+            message.contains('.png') ||
+            message.contains('cloudinary'));
     return Align(
       alignment: isCurrentUser ? Alignment.centerRight : Alignment.centerLeft,
       child: Container(
@@ -29,13 +33,21 @@ class ChatBubble extends StatelessWidget {
             bottomRight: Radius.circular(isCurrentUser ? 0 : 12),
           ),
         ),
-        child: Text(
-          message,
-          style: TextStyle(
-            color: isCurrentUser ? Colors.white : Colors.black,
-            fontSize: 16,
-          ),
-        ),
+        child: isImage
+            ? ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: Image.network(
+                  message,
+                  fit: BoxFit.cover,
+                ),
+              )
+            : Text(
+                message,
+                style: TextStyle(
+                  color: isCurrentUser ? Colors.white : Colors.black,
+                  fontSize: 16,
+                ),
+              ),
       ),
     );
   }
