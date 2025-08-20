@@ -26,6 +26,10 @@ class MyPost extends StatelessWidget {
   Widget build(BuildContext context) {
     final currentUserEmail = FirebaseAuth.instance.currentUser!.email!;
     final bool isLiked = likes.contains(currentUserEmail);
+    final isImage = message.startsWith('http') &&
+        (message.contains('.jpg') ||
+            message.contains('.png') ||
+            message.contains('cloudinary'));
 
     return Padding(
       padding: const EdgeInsets.all(20),
@@ -64,8 +68,11 @@ class MyPost extends StatelessWidget {
                         style: const TextStyle(
                           color: Colors.black87,
                           fontWeight: FontWeight.bold,
-                          fontSize: 20,
+                          fontSize: 16,
                         ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        softWrap: false,
                       ),
                       Text(
                         DateFormat('dd-MM-yyyy HH:mm').format((time).toDate()),
@@ -84,16 +91,28 @@ class MyPost extends StatelessWidget {
             ),
 
             // Post message
-            Padding(
-              padding: const EdgeInsets.only(left: 20, top: 10, bottom: 10),
-              child: Text(
-                message,
-                style: const TextStyle(
-                  color: Colors.black87,
-                  fontSize: 20,
-                ),
-              ),
-            ),
+            isImage
+                ? ClipRRect(
+                    borderRadius: BorderRadius.circular(0),
+                    child: Center(
+                      child: Image.network(
+                        message,
+                        fit: BoxFit.cover,
+                        width: MediaQuery.of(context).size.width,
+                      ),
+                    ),
+                  )
+                : Padding(
+                    padding:
+                        const EdgeInsets.only(left: 20, top: 10, bottom: 10),
+                    child: Text(
+                      message,
+                      style: const TextStyle(
+                        color: Colors.black87,
+                        fontSize: 20,
+                      ),
+                    ),
+                  ),
 
             // Action bar
             Padding(

@@ -27,10 +27,10 @@ class ChatBubble extends StatelessWidget {
         decoration: BoxDecoration(
           color: isCurrentUser ? Colors.green : Colors.grey[500],
           borderRadius: BorderRadius.only(
-            topLeft: const Radius.circular(12),
-            topRight: const Radius.circular(12),
-            bottomLeft: Radius.circular(isCurrentUser ? 12 : 0),
-            bottomRight: Radius.circular(isCurrentUser ? 0 : 12),
+            topLeft: const Radius.circular(14),
+            topRight: const Radius.circular(14),
+            bottomLeft: Radius.circular(isCurrentUser ? 14 : 0),
+            bottomRight: Radius.circular(isCurrentUser ? 0 : 14),
           ),
         ),
         child: isImage

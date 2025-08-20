@@ -6,10 +6,16 @@ import 'package:mini_social_media/components/my_post.dart';
 import 'package:mini_social_media/components/my_post_button.dart';
 import 'package:mini_social_media/components/my_textfield.dart';
 import 'package:mini_social_media/database/firestore.dart';
+import 'package:mini_social_media/services/img/image_service.dart';
 
-class HomePage extends StatelessWidget {
-  HomePage({super.key});
+class HomePage extends StatefulWidget {
+  const HomePage({super.key});
 
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
   // firestore access
   final FirestoreDatabase database = FirestoreDatabase();
 
@@ -17,7 +23,8 @@ class HomePage extends StatelessWidget {
   final User? currentUser = FirebaseAuth.instance.currentUser;
 
   // controller
-  TextEditingController newPostController = TextEditingController();
+  final TextEditingController newPostController = TextEditingController();
+
   void postMessage() {
     // only post if there is something in the textfield
     if (newPostController.text.isNotEmpty) {
@@ -27,6 +34,13 @@ class HomePage extends StatelessWidget {
 
     // clear the controller
     newPostController.clear();
+  }
+
+  void pickAndUploadImage() async {
+    final imageUrl = await ImageService.pickAndUploadImage();
+    if (imageUrl != null) {
+      database.addPost(imageUrl);
+    }
   }
 
   @override
@@ -53,9 +67,17 @@ class HomePage extends StatelessWidget {
               children: [
                 Expanded(
                   child: MyTextfield(
-                      hintText: "Say something...",
-                      obscureText: false,
-                      controller: newPostController),
+                    hintText: "Say something...",
+                    obscureText: false,
+                    controller: newPostController,
+                    isEnabled: true,
+                    onPressed: () {
+                      // handle image attachment
+                      pickAndUploadImage(); // 📎 callback when pressed
+
+                      // this can be implemented later
+                    },
+                  ),
                 ),
                 MyPostButton(onTap: postMessage),
               ],

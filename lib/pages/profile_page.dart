@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:mini_social_media/components/my_user_tile.dart';
 
 class ProfilePage extends StatelessWidget {
   ProfilePage({super.key});
@@ -68,21 +69,39 @@ class ProfilePage extends StatelessWidget {
                   const SizedBox(
                     height: 25,
                   ),
-
-                  Text(
-                    user!['username'],
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
-                        fontSize: 24),
+                  Center(
+                    child: Text(
+                      "Hello, ${user!['username']}!",
+                      style: TextStyle(
+                        color: Colors.grey[500],
+                        fontStyle: FontStyle.italic,
+                        fontSize: 16,
+                      ),
+                    ),
                   ),
+
                   const SizedBox(
                     height: 10,
                   ),
-                  Text(
-                    user['email'],
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold, color: Colors.grey[600]),
+                  Center(
+                    child: Text(
+                      "\"Be yourself - that's the best thing!!\"",
+                      style: TextStyle(
+                        color: Colors.grey[500],
+                        fontStyle: FontStyle.italic,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(
+                    height: 15,
+                  ),
+                  // username and email
+                  MyUserTile(title: "Username", value: user['username']),
+                  MyUserTile(title: "Email", value: user['email']),
+                  const SizedBox(
+                    height: 40,
                   ),
                 ],
               ),
